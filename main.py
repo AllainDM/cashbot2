@@ -7,6 +7,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 
 import config
+from parser import split_message
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -29,7 +30,6 @@ async def cmd_start(message: types.Message):
     if user_id in config.USERS:
         logger.info(f"Запрос от пользователя {user_id}")
         await message.answer("Привет! Я бот...")
-
 
 
 # Основная функция запуска бота
