@@ -19,6 +19,7 @@ BOT_API_TOKEN = os.getenv("BOT_TOKEN")
 bot = Bot(token=BOT_API_TOKEN)
 dp = Dispatcher()
 
+
 # Тестовый обработчик команды /start
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
@@ -30,6 +31,7 @@ async def cmd_start(message: types.Message):
         await message.answer("Привет! Я бот...")
 
 
+
 # Основная функция запуска бота
 async def main():
     # Удаляем вебхук, если он был установлен
@@ -38,6 +40,7 @@ async def main():
     # Запускаем поллинг
     logger.info("Бот запущен")
     await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
