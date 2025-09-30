@@ -1,6 +1,6 @@
 import pytest
-# Предполагаем, что split_message находится в вашем модуле parser
-from parser import split_message
+
+from app.parser import split_message
 
 @pytest.mark.asyncio
 async def test_split_message_sum_at_start_simple():
