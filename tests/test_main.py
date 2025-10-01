@@ -52,16 +52,16 @@ async def test_successful_note_creation(mock_split, mock_crud, mock_config):
 
     # 2. Выполнение
     await echo_mess(message_mock)
-#
-#     # 3. Проверка
-#     mock_split.assert_called_once_with("100 Еда Обед")
-#     mock_crud.add_note.assert_called_once_with(
-#         user_tg_id=USER_ID,
-#         category="Еда",
-#         sub_category="Обед",
-#         summ="100",
-#         description="Еда Обед"
-#     )
+
+    # # 3. Проверка
+    # mock_split.assert_called_once_with("100 Еда Обед")
+    # mock_crud.add_note.assert_called_once_with(
+    #     user_tg_id=USER_ID,
+    #     category="Еда",
+    #     sub_category="Обед",
+    #     summ="100",
+    #     description="Еда Обед"
+    # )
 
 
 # Парсер сообщения. Отправим сообщение с ошибкой.
@@ -79,8 +79,11 @@ async def test_parsing_failure_sends_error_message(mock_split, mock_crud, mock_c
     mock_split.return_value = (None, None, None, None)
 
     # Имитируем объект сообщения (минимум полей)
-    message_mock = AsyncMock(spec=Message, text=" некорректный_формат", from_user=user_mock)
+    message_mock = AsyncMock(spec=Message, text="некорректный_формат", from_user=user_mock)
     message_mock.from_user.id = USER_ID
+
+    # Добавляем асинхронный мок для message.answer
+    message_mock.answer = AsyncMock()
 
     # 2. Выполнение тестируемой функции
     await echo_mess(message_mock)
@@ -90,7 +93,7 @@ async def test_parsing_failure_sends_error_message(mock_split, mock_crud, mock_c
     mock_crud.add_note.assert_not_called() # Проверяем, что в БД ничего не попало
 
     # Проверяем, что бот ответил пользователю (ответ по умолчанию)
-    # message_mock.answer.assert_called_once()
+    message_mock.answer.assert_called_once()
     # Без проверки текста ответа:
     # message_mock.answer.assert_called_once_with("Сообщение об ошибке")
 
