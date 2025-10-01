@@ -30,6 +30,16 @@ async def test_split_message_sum_at_end():
     assert descr == "Кофе Завтрак"
 
 @pytest.mark.asyncio
+async def test_split_message_sum_at_end_add_space():
+    # Сумма в конце и дополнительные пробелы
+    msg = "  Кофе  Завтрак 150   "
+    summ, cat, sub_cat, descr = await split_message(msg)
+    assert summ == 150
+    assert cat == "Кофе"
+    assert sub_cat == "Завтрак"
+    assert descr == "Кофе Завтрак"
+
+@pytest.mark.asyncio
 async def test_split_message_no_sum():
     # Нет суммы
     msg = "Просто текст"
