@@ -7,7 +7,10 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 
 import config
-from parser import split_message
+# import app.crud
+
+from app import crud
+from app.parser import split_message
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -45,10 +48,12 @@ async def echo_mess(message: types.Message):
         msg = message.text
         summ, cat, sub_cat, descr = await split_message(msg)
         # 2. Передадим на запись
-        # if summ:
-        #     await crud.add_note(user_tg_id=user_id, category=cat, sub_category=cat, summ=summ, description=descr)
-        # else:
-        #     logger.info(f"Сообщение не для записи: {msg}")
+        if summ:
+            ...
+            # await crud.add_note(user_tg_id=user_id, category=cat, sub_category=cat, summ=summ, description=descr)
+        else:
+            logger.info(f"Сообщение не для записи: {msg}")
+            await message.answer(f"Сообщение не для записи: {msg}")
     else:
         logger.info(f"Запрос от неавторизованного пользователя {user_id}")
 

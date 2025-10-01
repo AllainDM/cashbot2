@@ -42,4 +42,5 @@ async def split_message(msg: str) -> tuple[int | None, str, str, str | None]:
     if not category or not description:
         return None, "", "", ""
 
+    print(summ, category, sub_category, description)
     return summ, category, sub_category, description
