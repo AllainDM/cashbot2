@@ -39,11 +39,15 @@ async def test_unauthorized_user_is_ignored(mock_split, mock_crud, mock_config):
 @patch('app.main.split_message')    # Парсер сообщений(разделение на сумму и категории).
 async def test_successful_note_creation(mock_split, mock_crud, mock_config):
     # 1. Настройка
+    # Делаем add_note асинхронным моком
+    mock_crud.add_note = AsyncMock(return_value=True)
+
     # Имитируем, что пользователь авторизован
     mock_config.USERS = [USER_ID]
     user_mock = AsyncMock(spec=User)
 
     # Имитируем, что парсер успешно обработал сообщение
+    # (summ, cat, sub_cat, descr)
     mock_split.return_value = ("100", "Еда", "Обед", "Еда Обед")
 
     # Имитируем объект сообщения (минимум полей)
@@ -53,15 +57,15 @@ async def test_successful_note_creation(mock_split, mock_crud, mock_config):
     # 2. Выполнение
     await echo_mess(message_mock)
 
-    # # 3. Проверка
-    # mock_split.assert_called_once_with("100 Еда Обед")
-    # mock_crud.add_note.assert_called_once_with(
-    #     user_tg_id=USER_ID,
-    #     category="Еда",
-    #     sub_category="Обед",
-    #     summ="100",
-    #     description="Еда Обед"
-    # )
+    # 3. Проверка
+    mock_split.assert_called_once_with("100 Еда Обед")
+    mock_crud.add_note.assert_called_once_with(
+        user_tg_id=USER_ID,
+        category="Еда",
+        sub_category="Обед",
+        summ="100",
+        description="Еда Обед"
+    )
 
 
 # Парсер сообщения. Отправим сообщение с ошибкой.

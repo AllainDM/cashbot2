@@ -49,8 +49,9 @@ async def echo_mess(message: types.Message):
         summ, cat, sub_cat, descr = await split_message(msg)
         # 2. Передадим на запись
         if summ:
-            ...
-            # await crud.add_note(user_tg_id=user_id, category=cat, sub_category=cat, summ=summ, description=descr)
+            # print("Тесттты")
+            # print(summ, cat, sub_cat, descr)
+            await crud.add_note(user_tg_id=user_id, category=cat, sub_category=sub_cat, summ=summ, description=descr)
         else:
             logger.info(f"Сообщение не для записи: {msg}")
             await message.answer(f"Сообщение не для записи: {msg}")

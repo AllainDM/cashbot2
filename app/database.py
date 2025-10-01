@@ -29,7 +29,7 @@ async def get_async_sqlite_session() -> Optional[aiosqlite.Connection]:
         logger.error(f"Ошибка асинхронного соединения с БД: {e}")
         return None
 
-async def updates_tables():
+async def update_tables():
     """
     Асинхронное создание таблиц, если они не существуют.
     """
