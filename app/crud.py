@@ -6,6 +6,7 @@ from datetime import datetime
 
 import aiosqlite
 
+import config
 from app.database import get_async_sqlite_session
 
 # Настройка логирования
@@ -24,7 +25,8 @@ async def add_note(user_tg_id: int, category: str, sub_category: str, summ: str 
         # Используем асинхронный контекстный менеджер 'async with',
         # который предоставляет функция get_async_sqlite_session.
         # Это обеспечивает получение и автоматическое закрытие/освобождение соединения.
-        async with get_async_sqlite_session() as connection:
+        # async with await get_async_sqlite_session() as connection:
+        async with aiosqlite.connect(config.DATABASE_NAME) as connection:
 
             date = datetime.now().strftime("%d.%m.%Y")  # Формат даты: день, месяц, год
 

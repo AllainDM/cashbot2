@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-"""Модуль для создания соединения с БД"""
+# """Модуль для создания соединения с БД"""
 
 async def get_async_sqlite_session() -> Optional[aiosqlite.Connection]:
     """
