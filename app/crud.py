@@ -14,24 +14,19 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-async def add_note(user_tg_id: int, category: str, sub_category: str, summ: str | int, description: str) -> bool:
+async def add_note(user_tg_id: int, category: str, sub_category: str, summ: int, description: str) -> bool:
     """
     Асинхронно добавляет новую запись в базу данных SQLite.
     Использует aiosqlite для неблокирующих операций.
     """
     logger.info("Запуск асинхронной функции add_note")
 
-    connection = await get_async_sqlite_session() # 1. Получаем соединение
+    # 1. Получаем соединение
+    connection = await get_async_sqlite_session()
     if connection is None:
         return False
 
     try:
-        # Используем асинхронный контекстный менеджер 'async with',
-        # который предоставляет функция get_async_sqlite_session.
-        # Это обеспечивает получение и автоматическое закрытие/освобождение соединения.
-        # async with await get_async_sqlite_session() as connection:
-        # async with aiosqlite.connect(config.DATABASE_NAME) as connection:
-
         date = datetime.now().strftime("%d.%m.%Y")  # Формат даты: день, месяц, год
 
         # Асинхронное выполнение SQL-запроса

@@ -46,7 +46,7 @@ async def update_tables():
                 user_tg_id INTEGER NOT NULL,
                 category TEXT,
                 sub_category TEXT,
-                summ TEXT,
+                summ INTEGER,
                 description TEXT,
                 date TEXT
             );
