@@ -1,9 +1,11 @@
+from datetime import datetime
 
 import pytest
 from unittest.mock import AsyncMock, patch
 from aiogram.types import Message, User  # Используем настоящий класс Message для имитации структуры
 
 from app.main import echo_mess
+from app.main import cmd_report
 
 USER_ID = 123456  # ид пользователя для проверки авторизации
 
@@ -100,4 +102,27 @@ async def test_parsing_failure_sends_error_message(mock_split, mock_crud, mock_c
     message_mock.answer.assert_called_once()
     # Без проверки текста ответа:
     # message_mock.answer.assert_called_once_with("Сообщение об ошибке")
+
+
+# Запрос отчета за месяц
+@pytest.mark.asyncio
+@patch('app.main.config')           # Конфиг со списком пользователей.
+@patch('app.main.crud')             # Модуль взаимодействия с бд.
+async def test_get_report_for_month(mock_crud, mock_config):
+    # 1. Настройка: Что должны возвращать наши моки
+    # Имитируем, что пользователь авторизован
+    mock_config.USERS = [USER_ID]
+    user_mock = AsyncMock(spec=User)
+
+    # Создаем минимально необходимый мок сообщения
+    mock_message = AsyncMock(spec=Message, from_user=user_mock)
+    mock_message.from_user.id = USER_ID
+    mock_message.text = "/report"
+
+    # Мок ответа бота
+    mock_message.answer = AsyncMock()
+
+    # 2. Выполнение
+    await cmd_report(mock_message)
+
 

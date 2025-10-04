@@ -1,6 +1,7 @@
 import os
 import asyncio
 import logging
+from datetime import datetime
 
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, types
@@ -55,6 +56,19 @@ async def echo_mess(message: types.Message):
             await message.answer(f"Сообщение не для записи: {msg}")
     else:
         logger.info(f"Запрос от неавторизованного пользователя {user_id}")
+
+
+@dp.message(Command("report", "отчет", "отчёт"))
+async def cmd_report(message: types.Message):
+    # Узнаем ид пользователя.
+    user_id = message.from_user.id
+    # Авторизация
+    if user_id in config.USERS:
+        logger.info(f"Запрос от пользователя {user_id}")
+    else: # Добавим проверку доступа, если ее нет
+        logger.info(f"Запрос от не авторизованного пользователя {user_id}")
+        # await message.reply("У вас нет доступа к этой функции.")
+        return
 
 
 # Основная функция запуска бота
