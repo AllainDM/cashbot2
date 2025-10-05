@@ -12,6 +12,7 @@ import config
 
 from app import crud
 from app.parser import split_message
+from app.report_handler import ReportHandler
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -65,6 +66,8 @@ async def cmd_report(message: types.Message):
     # Авторизация
     if user_id in config.USERS:
         logger.info(f"Запрос от пользователя {user_id}")
+        report_handler = ReportHandler()
+        await report_handler.get_month_report()
     else: # Добавим проверку доступа, если ее нет
         logger.info(f"Запрос от не авторизованного пользователя {user_id}")
         # await message.reply("У вас нет доступа к этой функции.")

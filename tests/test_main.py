@@ -107,8 +107,8 @@ async def test_parsing_failure_sends_error_message(mock_split, mock_crud, mock_c
 # Запрос отчета за месяц
 @pytest.mark.asyncio
 @patch('app.main.config')           # Конфиг со списком пользователей.
-@patch('app.main.crud')             # Модуль взаимодействия с бд.
-async def test_get_report_for_month(mock_crud, mock_config):
+@patch('app.main.ReportHandler')   # Модуль взаимодействия с бд.
+async def test_get_report_for_month(mock_report_handler_class, mock_config):
     # 1. Настройка: Что должны возвращать наши моки
     # Имитируем, что пользователь авторизован
     mock_config.USERS = [USER_ID]
@@ -122,7 +122,18 @@ async def test_get_report_for_month(mock_crud, mock_config):
     # Мок ответа бота
     mock_message.answer = AsyncMock()
 
+    # Получаем фиктивный экземпляр класса ReportHandler, который вернется при ReportHandler()
+    mock_report_handler_instance = mock_report_handler_class.return_value
+    # Настраиваем асинхронный метод на фиктивном экземпляре.
+    mock_report_handler_instance.get_month_report = AsyncMock()
+
     # 2. Выполнение
     await cmd_report(mock_message)
 
+    # 3. Проверка
+    # Проверяем, что класс ReportHandler был вызван(создан экземпляр)
+    mock_report_handler_class.assert_called_once()
+
+    # Проверяем, что метод get_month_report был вызван на экземпляре
+    mock_report_handler_instance.get_month_report.assert_awaited_once()
 
