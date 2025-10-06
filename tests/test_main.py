@@ -127,6 +127,10 @@ async def test_get_report_for_month(mock_report_handler_class, mock_config):
     # Настраиваем асинхронный метод на фиктивном экземпляре.
     mock_report_handler_instance.get_month_report = AsyncMock()
 
+    # Имитируем, что метод get_month_report возвращает некий отчет
+    expected_report_text = "Содержание отчета за месяц."
+    mock_report_handler_instance.get_month_report.return_value = expected_report_text
+
     # 2. Выполнение
     await cmd_report(mock_message)
 
@@ -136,4 +140,7 @@ async def test_get_report_for_month(mock_report_handler_class, mock_config):
 
     # Проверяем, что метод get_month_report был вызван на экземпляре
     mock_report_handler_instance.get_month_report.assert_awaited_once()
+
+    # Мы ожидаем, что mock_message.reply или mock_message.answer будет вызван с текстом отчета.
+    mock_message.answer.assert_awaited_once_with(expected_report_text)
 
