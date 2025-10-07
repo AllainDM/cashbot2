@@ -121,6 +121,7 @@ async def test_get_report_for_month(mock_report_handler_class, mock_config):
 
     # Мок ответа бота
     mock_message.answer = AsyncMock()
+    mock_message.reply = AsyncMock()
 
     # Получаем фиктивный экземпляр класса ReportHandler, который вернется при ReportHandler()
     mock_report_handler_instance = mock_report_handler_class.return_value
@@ -128,7 +129,7 @@ async def test_get_report_for_month(mock_report_handler_class, mock_config):
     mock_report_handler_instance.get_month_report = AsyncMock()
 
     # Имитируем, что метод get_month_report возвращает некий отчет
-    expected_report_text = "Содержание отчета за месяц."
+    expected_report_text = "Временный текст отчета"
     mock_report_handler_instance.get_month_report.return_value = expected_report_text
 
     # 2. Выполнение
@@ -142,5 +143,5 @@ async def test_get_report_for_month(mock_report_handler_class, mock_config):
     mock_report_handler_instance.get_month_report.assert_awaited_once()
 
     # Мы ожидаем, что mock_message.reply или mock_message.answer будет вызван с текстом отчета.
-    mock_message.answer.assert_awaited_once_with(expected_report_text)
+    mock_message.reply.assert_awaited_once_with(expected_report_text)
 
