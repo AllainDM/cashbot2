@@ -67,7 +67,8 @@ async def cmd_report(message: types.Message):
     if user_id in config.USERS:
         logger.info(f"Запрос от пользователя {user_id}")
         report_handler = ReportHandler()
-        await report_handler.get_month_report()
+        report_text = await report_handler.get_month_report()
+        await message.reply(report_text)
     else: # Добавим проверку доступа, если ее нет
         logger.info(f"Запрос от не авторизованного пользователя {user_id}")
         # await message.reply("У вас нет доступа к этой функции.")
