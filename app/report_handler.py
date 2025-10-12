@@ -2,12 +2,7 @@ from datetime import datetime
 
 from aiogram import types
 
-
-# Словарь для преобразования названий месяцев в их числовые значения
-MONTH_MAP = {
-    "январь": 1, "февраль": 2, "март": 3, "апрель": 4, "май": 5, "июнь": 6,
-    "июль": 7, "август": 8, "сентябрь": 9, "октябрь": 10, "ноябрь": 11, "декабрь": 12
-}
+from config import MONTH_MAP
 
 
 class ReportHandler:
@@ -15,7 +10,6 @@ class ReportHandler:
         self.message = message
         self.month_name = None
         self.month_number = None
-
 
 
     async def get_month_report(self):
@@ -32,9 +26,8 @@ class ReportHandler:
 
         if len(args) < 2:
             # Если месяц не указан, используем текущий
-            today = datetime.now()
-            self.month_number = today.month
-            # Можно опционально получить название месяца для ответа, если нужно
+            self.month_number = datetime.now().month
+            # Получим название месяца для ответа
             self.month_name = list(MONTH_MAP.keys())[list(MONTH_MAP.values()).index(self.month_number)]
             await self.message.reply(f"Месяц не указан. Формирую отчет за {self.month_name.capitalize()} {current_year} года.")
         else:
