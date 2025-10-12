@@ -37,7 +37,24 @@ async def cmd_start(message: types.Message):
         await message.answer("Привет! Я бот...")
 
 
+@dp.message(Command("report", "отчет", "отчёт"))
+async def cmd_report(message: types.Message):
+    # Узнаем ид пользователя.
+    user_id = message.from_user.id
+    # Авторизация
+    if user_id in config.USERS:
+        logger.info(f"Запрос от пользователя {user_id}")
+        report_handler = ReportHandler(message)
+        report_text = await report_handler.get_month_report()
+        await message.reply(report_text)
+    else: # Добавим проверку доступа, если ее нет
+        logger.info(f"Запрос от не авторизованного пользователя {user_id}")
+        # await message.reply("У вас нет доступа к этой функции.")
+        return
+
+
 # Основной обработчик сообщений от пользователя.
+# !!! Функция должна располагаться снизу от других запросов.
 @dp.message()
 async def echo_mess(message: types.Message):
     # Узнаем ид пользователя.
@@ -57,22 +74,6 @@ async def echo_mess(message: types.Message):
             await message.answer(f"Сообщение не для записи: {msg}")
     else:
         logger.info(f"Запрос от неавторизованного пользователя {user_id}")
-
-
-@dp.message(Command("report", "отчет", "отчёт"))
-async def cmd_report(message: types.Message):
-    # Узнаем ид пользователя.
-    user_id = message.from_user.id
-    # Авторизация
-    if user_id in config.USERS:
-        logger.info(f"Запрос от пользователя {user_id}")
-        report_handler = ReportHandler()
-        report_text = await report_handler.get_month_report()
-        await message.reply(report_text)
-    else: # Добавим проверку доступа, если ее нет
-        logger.info(f"Запрос от не авторизованного пользователя {user_id}")
-        # await message.reply("У вас нет доступа к этой функции.")
-        return
 
 
 # Основная функция запуска бота

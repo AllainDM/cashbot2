@@ -13,6 +13,7 @@ TEST_SUB_CATEGORY = "Обед"
 TEST_SUMM = 100
 TEST_DESCRIPTION = "Еда Обед"
 
+# Тест успешного добавления записи в БД.
 @pytest.mark.asyncio
 @patch('app.crud.datetime')
 @patch('app.crud.get_async_sqlite_session')
@@ -69,12 +70,11 @@ async def test_crud_add_note_success(mock_get_session, mock_datetime):
     assert result is True
 
 
-# --- Тест обработки ошибки БД ---
+# Тест обработки ошибки БД.
 @pytest.mark.asyncio
 @patch('app.crud.get_async_sqlite_session')
 async def test_crud_add_note_db_failure(mock_get_session):
     # 1. Настройка Моков.
-
     # Создаем мок объекта соединения.
     mock_connection = AsyncMock()
     mock_get_session.return_value = mock_connection
