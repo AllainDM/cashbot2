@@ -7,10 +7,6 @@ from unittest.mock import AsyncMock, patch
 from app.report_handler import ReportHandler
 
 
-# Устанавливаем локаль для корректного отображения названия месяца (если это потребуется)
-# В реальной среде это может потребовать настройки окружения, но для теста мы просто
-# проверим наличие конкретной строки.
-
 
 @pytest.mark.asyncio
 async def test_get_month_report_includes_current_month_name():
@@ -24,10 +20,6 @@ async def test_get_month_report_includes_current_month_name():
 
     # 1. Настройка
     handler = ReportHandler()
-
-    # Определяем название текущего месяца на русском языке
-    # В Python это нужно делать с учетом локали, но для простоты мы ожидаем конкретный формат.
-    # Для целей TDD мы ожидаем, что в отчете будет слово 'Отчет за <Месяц>'.
 
     # Получаем текущее название месяца на английском, так как locale может быть не настроен
     current_month_english = datetime.now().strftime("%B")
