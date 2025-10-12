@@ -67,3 +67,40 @@ async def test_crud_add_note_success(mock_get_session, mock_datetime):
 
     # Проверяем, что функция вернула успешный результат.
     assert result is True
+
+
+# --- Тест обработки ошибки БД ---
+@pytest.mark.asyncio
+@patch('app.crud.get_async_sqlite_session')
+async def test_crud_add_note_db_failure(mock_get_session):
+    # 1. Настройка Моков.
+
+    # Создаем мок объекта соединения.
+    mock_connection = AsyncMock()
+    mock_get_session.return_value = mock_connection
+
+    # Имитируем ошибку: заставляем execute() выбросить исключение.
+    mock_connection.execute.side_effect = Exception("Database error!")
+
+    # 2. Выполнение
+    result = await add_note(
+        user_tg_id=TEST_USER_ID,
+        category=TEST_CATEGORY,
+        sub_category=TEST_SUB_CATEGORY,
+        summ=TEST_SUMM,
+        description=TEST_DESCRIPTION
+    )
+
+    # 3. Проверка.
+    # Проверяем, что execute была вызвана, но вызвала ошибку.
+    mock_connection.execute.assert_called_once()
+
+    # Проверяем, что commit НЕ был вызван (транзакция не фиксируется при ошибке)
+    mock_connection.commit.assert_not_called()
+
+    # Проверяем, что соединение было закрыто (в блоке finally).
+    mock_connection.close.assert_called_once()
+
+    # Проверяем, что функция вернула False при ошибке.
+    assert result is False
+
