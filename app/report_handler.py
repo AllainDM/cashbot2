@@ -13,9 +13,9 @@ class ReportHandler:
 
 
     async def get_month_report(self):
-        # Получим месяц
-        await self._get_month()
-        print(f"Ваш отчет за {self.month_name.capitalize()}")
+        await self._get_month() # Получим месяц
+
+
         return f"Ваш отчет за {self.month_name.capitalize()}"
 
 

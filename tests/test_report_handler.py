@@ -53,7 +53,7 @@ async def test_reply_is_called_when_month_is_missing():
     # Проверяем, что message.reply был вызван.
     mock_message.reply.assert_called_once()
 
-    # Проверяем, что message.reply был вызван ровно 1 раз
+    # Проверяем, что message.reply был вызван ровно 1 раз. Повторяет проверку выше.
     # assert mock_message.reply.call_count == 1
 
     # Получаем текущий номер месяца, чтобы знать, какое название месяца ожидать
@@ -71,11 +71,8 @@ async def test_reply_is_called_when_month_is_missing():
 @pytest.mark.asyncio
 async def test_get_month_report_includes_current_month_name():
     """
-    Тест проверяет, что ReportHandler.get_month_report() возвращает отчет,
-    который динамически содержит название текущего месяца на русском языке.
-
-    Это КРАСНЫЙ ТЕСТ, так как текущая реализация возвращает только
-    "Временный текст отчета", который не содержит названия месяца.
+    Тест проверяет, что ReportHandler.get_month_report() возвращает отчет.
+    Совпадение по первым словам отчета.
     """
 
     # 1. Настройка.
@@ -91,13 +88,12 @@ async def test_get_month_report_includes_current_month_name():
 
     # Создадим ожидаемое ключевое слово, которое ДОЛЖНО быть в отчете
     # Например, мы ожидаем увидеть в отчете, например: "Ваш отчет за Октябрь 2025 года"
-    # ВНИМАНИЕ: Для падения теста мы ищем просто слово "Отчет"
     expected_keyword_start = "Ваш отчет за"
 
     # 2. Выполнение
     report_text = await handler.get_month_report()
 
-    # 3. Проверка (КРАСНАЯ ЧАСТЬ ТЕСТА)
+    # 3. Проверка
     # Проверяем, что отчет начинается с ожидаемой фразы (или содержит её)
     assert report_text.startswith(expected_keyword_start)
 

@@ -21,7 +21,7 @@ async def test_crud_add_note_success(mock_get_session, mock_datetime):
     # 1. Настройка Моков.
 
     # Устанавливаем предсказуемую дату, которую crud.py будет использовать.
-    # Это позволяет нам проверить, что SQL-запрос содержит правильную дату.
+    # Чтобы быть уверенным, что тест падает от реальной ошибки.
     fixed_date_str = "05.10.2025"
     mock_datetime.now.return_value.strftime.return_value = fixed_date_str
 

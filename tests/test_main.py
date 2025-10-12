@@ -107,7 +107,7 @@ async def test_parsing_failure_sends_error_message(mock_split, mock_crud, mock_c
 # Запрос отчета за месяц
 @pytest.mark.asyncio
 @patch('app.main.config')           # Конфиг со списком пользователей.
-@patch('app.main.ReportHandler')   # Модуль взаимодействия с бд.
+@patch('app.main.ReportHandler')    # Модуль взаимодействия с бд.
 async def test_get_report_for_month(mock_report_handler_class, mock_config):
     # 1. Настройка: Что должны возвращать наши моки
     # Имитируем, что пользователь авторизован
