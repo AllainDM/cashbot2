@@ -1,7 +1,8 @@
 from datetime import datetime
 
 import pytest
-from unittest.mock import patch, AsyncMock, MagicMock
+from typing import Optional
+from unittest.mock import patch, AsyncMock, MagicMock, Mock
 
 from app.crud import add_note
 
@@ -12,6 +13,7 @@ TEST_CATEGORY = "Еда"
 TEST_SUB_CATEGORY = "Обед"
 TEST_SUMM = 100
 TEST_DESCRIPTION = "Еда Обед"
+
 
 # Тест успешного добавления записи в БД.
 @pytest.mark.asyncio
@@ -68,6 +70,8 @@ async def test_crud_add_note_success(mock_get_session, mock_datetime):
 
     # Проверяем, что функция вернула успешный результат.
     assert result is True
+
+
 
 
 # Тест обработки ошибки БД.
