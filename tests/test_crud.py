@@ -107,32 +107,8 @@ async def test_get_notes_by_user_and_month_success():
     )
     await conn.commit()
 
-    # --- ACT (Действие) ---
-    # !!! Здесь вы вызываете вашу новую, переписанную асинхронную функцию
-    # get_notes_by_user_and_month(user_tg_id, month, year)
-    # Для теста нам нужно, чтобы она использовала get_test_db_session() вместо get_async_sqlite_session()
+    await get_notes_by_user_and_month(conn, test_user_id, 1, 2025)
 
-    # *Важно: При переписывании функции получения данных,
-    # нужно будет передавать в нее соединение (conn) для тестов,
-    # чтобы она могла работать с in-memory БД.*
-
-    # Предположим, что новая функция (или метод NoteRepository) принимает соединение
-    # notes = await db_service.get_notes_by_user_and_month_new(conn, test_user_id, 1, 2025)
-
-    # Для создания "красного" теста, мы можем вызвать функцию,
-    # которая вернет неверный результат или вызовет исключение:
-
-    # *Пример, если функция еще не реализована (вызовет NotImplementedError):*
-    # with pytest.raises(NotImplementedError):
-    #     # Замените на вызов вашей функции, пока она не реализована
-    #     await get_notes_by_user_and_month(test_user_id, 1, 2025)
-
-        # *Если вы уже начали реализацию, но она неверна, то тест должен упасть на ASSERT:*
-
-    # notes = await get_notes_by_user_and_month_new(conn, test_user_id, 1, 2025) # Вызов
-    # assert len(notes) == 2 # Это должно вызвать ошибку, если функция не вернет 2 записи
-
-    # --- TEARDOWN (Очистка) ---
     await conn.close()
 
 

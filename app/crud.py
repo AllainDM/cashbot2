@@ -49,3 +49,8 @@ async def add_note(user_tg_id: int, category: str, sub_category: str, summ: int,
 
     finally:
         await connection.close()
+
+
+async def get_notes_by_user_and_month(conn: aiosqlite.Connection, user_tg_id: int, month: int, year: int):
+    ...
+
