@@ -1,7 +1,7 @@
 import aiosqlite
 from typing import Optional
 
-# ТЕСТОВАЯ версия функции для получения соединения с in-memory БД
+# Функция для тестовых соединений с БД.
 async def get_test_db_session() -> Optional[aiosqlite.Connection]:
     """Создает асинхронное соединение с in-memory БД для тестов."""
     try:

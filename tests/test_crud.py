@@ -5,6 +5,8 @@ from typing import Optional
 from unittest.mock import patch, AsyncMock, MagicMock, Mock
 
 from app.crud import add_note
+from app.crud import get_notes_by_user_and_month
+from tests.test_db_utils import get_test_db_session, setup_test_db
 
 
 # Константы для теста
@@ -72,6 +74,66 @@ async def test_crud_add_note_success(mock_get_session, mock_datetime):
     assert result is True
 
 
+# Тест получения записей из БД.
+@pytest.mark.asyncio
+async def test_get_notes_by_user_and_month_success():
+    conn = await get_test_db_session()
+    assert conn is not None
+    await setup_test_db(conn)  # Создаем таблицу
+
+    # Дата для теста: 15.01.2025
+    test_user_id = 12345
+
+    # Добавляем 2 записи за январь 2025 (должны быть получены)
+    await conn.execute(
+        "INSERT INTO out (user_tg_id, category, sub_category, summ, description, date) VALUES (?, ?, ?, ?, ?, ?)",
+        (test_user_id, 'Еда', 'Обед', 500, 'Еда обед бизнес-ланч', '15.01.2025')
+    )
+    await conn.execute(
+        "INSERT INTO out (user_tg_id, category, sub_category, summ, description, date) VALUES (?, ?, ?, ?, ?, ?)",
+        (test_user_id, 'Развлечения', 'Кино', 1200, 'Развлечения кино', '20.01.2025')
+    )
+
+    # Добавляем 1 запись за ФЕВРАЛЬ 2025 (не должна быть получена)
+    await conn.execute(
+        "INSERT INTO out (user_tg_id, category, sub_category, summ, description, date) VALUES (?, ?, ?, ?, ?, ?)",
+        (test_user_id, 'Продукты', 'Магазин', 800, 'Молоко', '01.02.2025')
+    )
+
+    # Добавляем 1 запись для другого пользователя (не должна быть получена)
+    await conn.execute(
+        "INSERT INTO out (user_tg_id, category, sub_category, summ, description, date) VALUES (?, ?, ?, ?, ?, ?)",
+        (54321, 'Еда', 'Ужин', 700, 'Роллы', '15.01.2025')
+    )
+    await conn.commit()
+
+    # --- ACT (Действие) ---
+    # !!! Здесь вы вызываете вашу новую, переписанную асинхронную функцию
+    # get_notes_by_user_and_month(user_tg_id, month, year)
+    # Для теста нам нужно, чтобы она использовала get_test_db_session() вместо get_async_sqlite_session()
+
+    # *Важно: При переписывании функции получения данных,
+    # нужно будет передавать в нее соединение (conn) для тестов,
+    # чтобы она могла работать с in-memory БД.*
+
+    # Предположим, что новая функция (или метод NoteRepository) принимает соединение
+    # notes = await db_service.get_notes_by_user_and_month_new(conn, test_user_id, 1, 2025)
+
+    # Для создания "красного" теста, мы можем вызвать функцию,
+    # которая вернет неверный результат или вызовет исключение:
+
+    # *Пример, если функция еще не реализована (вызовет NotImplementedError):*
+    # with pytest.raises(NotImplementedError):
+    #     # Замените на вызов вашей функции, пока она не реализована
+    #     await get_notes_by_user_and_month(test_user_id, 1, 2025)
+
+        # *Если вы уже начали реализацию, но она неверна, то тест должен упасть на ASSERT:*
+
+    # notes = await get_notes_by_user_and_month_new(conn, test_user_id, 1, 2025) # Вызов
+    # assert len(notes) == 2 # Это должно вызвать ошибку, если функция не вернет 2 записи
+
+    # --- TEARDOWN (Очистка) ---
+    await conn.close()
 
 
 # Тест обработки ошибки БД.
