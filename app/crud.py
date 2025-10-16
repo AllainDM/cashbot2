@@ -1,8 +1,8 @@
 
 import logging
 from csv import excel
-from typing import Optional
 from datetime import datetime
+from typing import List, Dict, Any, Optional
 
 import aiosqlite
 

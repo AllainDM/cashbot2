@@ -74,9 +74,10 @@ async def test_crud_add_note_success(mock_get_session, mock_datetime):
     assert result is True
 
 
-# Тест получения записей из БД.
+# Тест получения записей из БД. С тестовой БД в памяти и добавлением в нее данных.
 @pytest.mark.asyncio
 async def test_get_notes_by_user_and_month_success():
+    # 1. Подготовка
     conn = await get_test_db_session()
     assert conn is not None
     await setup_test_db(conn)  # Создаем таблицу
@@ -84,6 +85,7 @@ async def test_get_notes_by_user_and_month_success():
     # Дата для теста: 15.01.2025
     test_user_id = 12345
 
+    # 2. Добавление тестовых данных.
     # Добавляем 2 записи за январь 2025 (должны быть получены)
     await conn.execute(
         "INSERT INTO out (user_tg_id, category, sub_category, summ, description, date) VALUES (?, ?, ?, ?, ?, ?)",
@@ -107,8 +109,20 @@ async def test_get_notes_by_user_and_month_success():
     )
     await conn.commit()
 
-    await get_notes_by_user_and_month(conn, test_user_id, 1, 2025)
+    # 3. Вызов тестируемой функции и проверка
+    notes = await get_notes_by_user_and_month(conn, test_user_id, 1, 2025)
 
+    # Проверяем, что получено ровно 2 записи
+    assert len(notes) == 2, f"Ожидалось 2 записи, получено {len(notes)}"
+
+    # Проверяем содержимое одной из записей, чтобы убедиться в правильности данных
+    # Поскольку порядок не гарантирован, проверим наличие нужных сумм
+    sums = {note['summ'] for note in notes}
+    assert 500 in sums
+    assert 1200 in sums
+    assert 800 not in sums  # Запись за Февраль не должна быть здесь
+
+    # 4. Очистка
     await conn.close()
 
 
