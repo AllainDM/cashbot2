@@ -40,8 +40,14 @@ async def test_reply_is_called_when_month_is_missing():
     # Создаем мок-сообщение, имитирующее команду без аргумента: /report
     mock_message = create_mock_message("/report")
 
+    # МОК для соединения с БД (пока достаточно простого Mock)
+    mock_db_conn = Mock()
+
+    # МОК для функции из CRUD
+    mock_crud_func = AsyncMock(return_value=[])
+
     # Инициализируем обработчик, передавая мок-сообщение.
-    handler = ReportHandler(mock_message)
+    handler = ReportHandler(message=mock_message, db_conn=mock_db_conn, crud_func=mock_crud_func)
 
     # 2. Выполнение.
     # Вызываем метод, который содержит логику проверки месяца и отправки ответа
@@ -79,8 +85,15 @@ async def test_get_month_report_includes_current_month_name():
     # Создаем мок-сообщение, имитирующее команду без аргумента: /report
     mock_message = create_mock_message("/report")
 
+    # МОК для соединения с БД (пока достаточно простого Mock)
+    mock_db_conn = Mock()
+
+    # МОК для функции из CRUD
+    mock_crud_func = AsyncMock(return_value=[])
+
     # Инициализируем обработчик, передавая мок-сообщение.
-    handler = ReportHandler(mock_message)
+    handler = ReportHandler(message=mock_message, db_conn=mock_db_conn, crud_func=mock_crud_func)
+
 
     # Получаем текущее название месяца на английском
     current_month_english = datetime.now().strftime("%B")

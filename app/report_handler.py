@@ -38,7 +38,7 @@ class ReportHandler:
             self.month_number = datetime.now().month
             # Получим название месяца для ответа
             self.month_name = list(MONTH_MAP.keys())[list(MONTH_MAP.values()).index(self.month_number)]
-            await self.message.reply(f"Месяц не указан. Формирую отчет за {self.month_name.capitalize()} {current_year} года.")
+            await self.message.reply(f"Месяц не указан. Формирую отчет за {self.month_name.capitalize()} {self.current_year} года.")
         else:
             # Если месяц указан, обрабатываем его как раньше
             self.month_name = args[1].lower()
