@@ -58,4 +58,7 @@ class ReportHandler:
             year=self.current_year      # TODO Пока всегда текущий год
         )
 
+        if not self.notes:
+            await self.message.reply(f"Записи для {self.month_name.capitalize()} {self.current_year} года не найдены.")
+            return
 
