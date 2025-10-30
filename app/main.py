@@ -13,6 +13,7 @@ import config
 from app import crud
 from app.parser import split_message
 from app.report_handler import ReportHandler
+from app.database import get_async_sqlite_session
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -44,9 +45,16 @@ async def cmd_report(message: types.Message):
     # Авторизация
     if user_id in config.USERS:
         logger.info(f"Запрос от пользователя {user_id}")
-        report_handler = ReportHandler(message)
-        report_text = await report_handler.get_month_report()
-        await message.reply(report_text)
+
+        async with get_async_sqlite_session() as db_conn:
+            if db_conn is None:
+                await message.reply("Не удалось подключиться к базе данных.")
+                return
+
+            report_handler = ReportHandler(message=message, db_conn=db_conn)
+            report_text = await report_handler.get_month_report()
+            await message.reply(report_text)
+
     else: # Добавим проверку доступа, если ее нет
         logger.info(f"Запрос от не авторизованного пользователя {user_id}")
         # await message.reply("У вас нет доступа к этой функции.")
