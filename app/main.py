@@ -55,7 +55,7 @@ async def cmd_report(message: types.Message):
             report_result = await report_handler.get_month_report()
 
             # TODO дописать какую-то реакцию, получен отчет или нет.
-            # await message.reply(report_text)
+            # await message.reply(report_result)
 
     else: # Добавим проверку доступа, если ее нет
         logger.info(f"Запрос от не авторизованного пользователя {user_id}")
