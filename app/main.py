@@ -52,13 +52,15 @@ async def cmd_report(message: types.Message):
                 return
 
             report_handler = ReportHandler(message=message, db_conn=db_conn, crud_func=crud.get_notes_by_user_and_month)
-            report_text = await report_handler.get_month_report()
-            await message.reply(report_text)
+            report_result = await report_handler.get_month_report()
+
+            # TODO дописать какую-то реакцию, получен отчет или нет.
+            # await message.reply(report_text)
 
     else: # Добавим проверку доступа, если ее нет
         logger.info(f"Запрос от не авторизованного пользователя {user_id}")
         # await message.reply("У вас нет доступа к этой функции.")
-        return
+        # return
 
 
 # Основной обработчик сообщений от пользователя.
