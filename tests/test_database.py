@@ -46,14 +46,15 @@ async def cleanup_test_db():
 @pytest.mark.asyncio
 async def test_get_async_sqlite_session_success():
     """Тест успешного асинхронного соединения с тестовой БД."""
-    conn = await get_async_sqlite_session()
+    # conn = await get_async_sqlite_session()
+    async with get_async_sqlite_session() as connection:
+        assert connection is not None
+        assert isinstance(connection, aiosqlite.Connection)
 
-    assert conn is not None
-    assert isinstance(conn, aiosqlite.Connection)
-    # Проверяем, что файл создан именно с тестовым именем
-    assert os.path.exists(config.DATABASE_NAME)
+        # Проверяем, что файл создан именно с тестовым именем
+        assert os.path.exists(config.DATABASE_NAME)
 
-    await conn.close()
+        await connection.close()
 
 
 @pytest.mark.asyncio
