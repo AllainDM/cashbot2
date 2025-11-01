@@ -23,16 +23,18 @@ async def get_async_sqlite_session() -> AsyncGenerator[aiosqlite.Connection, Non
     connection = None
     try:
         # Создаем асинхронное соединение с базой данных
+        # Если здесь ошибка, исключение будет поднято,
+        # yield connection не выполнится, блок 'async with' не запустится.
         connection = await aiosqlite.connect(config.DATABASE_NAME)
         # Устанавливаем row_factory для вывода данных в виде словаря
         connection.row_factory = aiosqlite.Row
         logger.debug("Асинхронное соединение с БД установлено.")
         yield connection # Возвращаем соединение для использования в блоке 'async with'
+    # Если исключение возникло до yield, finally все равно выполнится
     except Exception as e:
         logger.error(f"Ошибка асинхронного соединения с БД: {e}")
-        # Если соединение не удалось, yield не произойдет
-        # raise  # Переподнимаем исключение, чтобы вызывающий код мог его обработать
-        yield None
+        raise  # Переподнимаем исключение, чтобы вызывающий код мог его обработать
+        # yield None
     finally:
         if connection:
             await connection.close()
@@ -44,10 +46,6 @@ async def update_tables():
     Асинхронное создание таблиц, если они не существуют,
     с использованием контекстного менеджера.
     """
-    # connection = await get_async_sqlite_session()
-    # if connection is None:
-    #     logger.error("Не удалось получить соединение с БД для создания таблиц.")
-    #     return
     try:
         async with get_async_sqlite_session() as connection:
             # Асинхронное выполнение SQL-запроса
@@ -67,8 +65,3 @@ async def update_tables():
             await connection.commit()
     except Exception as e:
         logger.error(f"Ошибка при создании таблиц: {e}")
-    # Блок finally для закрытия connection не нужен,
-    # так как его обрабатывает контекстный менеджер.
-    # finally:
-    #     await connection.close()
-    #     logger.debug(f"Соединение с БД {config.DATABASE_NAME} закрыто.")
