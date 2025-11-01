@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import pytest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, patch, MagicMock
 from aiogram.types import Message, User  # Используем настоящий класс Message для имитации структуры
 
 from app.main import echo_mess
@@ -106,15 +106,15 @@ async def test_parsing_failure_sends_error_message(mock_split, mock_crud, mock_c
 
 
 # Запрос отчета за месяц
-# TODO тут не проверяет количество аргументов
-# Правильный тест ниже
 @pytest.mark.asyncio
 @patch('app.main.config')           # Конфиг со списком пользователей.
 @patch('app.main.ReportHandler')    # Модуль взаимодействия с бд.
-async def test_get_report_for_month(mock_report_handler_class, mock_config):
+@patch('app.main.crud.get_notes_by_user_and_month')
+@patch('app.main.get_async_sqlite_session', new_callable=MagicMock)
+async def test_get_report_for_month(mock_db_conn_context, mock_crud_func,  mock_report_handler_class, mock_config):
     # 1. Настройка: Что должны возвращать наши моки
     # Имитируем, что пользователь авторизован
-    USER_ID = 123456 # ИД для теста
+    # USER_ID = 123456 # ИД для теста
     mock_config.USERS = [USER_ID]
     user_mock = AsyncMock(spec=User)
 
@@ -126,6 +126,11 @@ async def test_get_report_for_month(mock_report_handler_class, mock_config):
     # Мок ответа бота
     mock_message.answer = AsyncMock()
     mock_message.reply = AsyncMock()
+
+    # Создаем мок для самого объекта соединения.
+    mock_db_conn = AsyncMock(name='db_conn')
+    # Настраиваем: при входе в контекстный менеджер (.__aenter__()) возвращается mock_db_conn.
+    mock_db_conn_context.return_value.__aenter__.return_value = mock_db_conn
 
     # Получаем фиктивный экземпляр класса ReportHandler, который вернется при ReportHandler()
     mock_report_handler_instance = mock_report_handler_class.return_value
@@ -140,9 +145,15 @@ async def test_get_report_for_month(mock_report_handler_class, mock_config):
     await cmd_report(mock_message)
 
     # 3. Проверка
-    # Проверяем, что класс ReportHandler был вызван(создан экземпляр)
-    # mock_report_handler_class.assert_called_once()
-    mock_report_handler_class.assert_called_once_with(mock_message)
+    # Проверяем, что контекстный менеджер был вызван
+    mock_db_conn_context.assert_called_once()
+
+    # Проверяем, что класс ReportHandler был вызван с новыми именованными аргументами!
+    mock_report_handler_class.assert_called_once_with(
+        message=mock_message,
+        db_conn=mock_db_conn,
+        crud_func=mock_crud_func
+    )
 
     # Проверяем, что метод get_month_report был вызван на экземпляре
     mock_report_handler_instance.get_month_report.assert_awaited_once()
@@ -151,7 +162,7 @@ async def test_get_report_for_month(mock_report_handler_class, mock_config):
     mock_message.reply.assert_awaited_once_with(expected_report_text)
 
 
-# Запрос отчета за месяц
+# Запрос отчета за месяц с неверным количеством аргументов
 @pytest.mark.asyncio
 @patch('app.main.config')
 # Мокируем ТОЛЬКО асинхронный метод получения отчета, чтобы проверить

@@ -51,7 +51,7 @@ async def cmd_report(message: types.Message):
                 await message.reply("Не удалось подключиться к базе данных.")
                 return
 
-            report_handler = ReportHandler(message=message, db_conn=db_conn)
+            report_handler = ReportHandler(message=message, db_conn=db_conn, crud_func=crud.get_notes_by_user_and_month)
             report_text = await report_handler.get_month_report()
             await message.reply(report_text)
 
