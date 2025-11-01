@@ -155,6 +155,18 @@ async def test_crud_add_note_db_failure(mock_get_session):
     # Имитируем ошибку: заставляем execute() выбросить исключение.
     mock_connection.execute.side_effect = Exception("Database error!")
 
+    # Создаем мок для контекстного менеджера
+    mock_context_manager = MagicMock()
+
+    # Настраиваем методы контекстного менеджера
+    #    Вход (__aenter__) возвращает mock_connection
+    mock_context_manager.__aenter__ = AsyncMock(return_value=mock_connection)
+    #    Выход (__aexit__) должен быть вызван
+    mock_context_manager.__aexit__ = AsyncMock(return_value=None)
+
+    # Настраиваем патч, чтобы он возвращал наш контекстный менеджер
+    mock_get_session.return_value = mock_context_manager
+
     # 2. Выполнение
     result = await add_note(
         user_tg_id=TEST_USER_ID,
@@ -171,8 +183,11 @@ async def test_crud_add_note_db_failure(mock_get_session):
     # Проверяем, что commit НЕ был вызван (транзакция не фиксируется при ошибке)
     mock_connection.commit.assert_not_called()
 
+    # Проверяем, что выход из контекстного менеджера был вызван (имитация finally).
+    mock_context_manager.__aexit__.assert_called_once()
+
     # Проверяем, что соединение было закрыто (в блоке finally).
-    mock_connection.close.assert_called_once()
+    # mock_connection.close.assert_called_once()
 
     # Проверяем, что функция вернула False при ошибке.
     assert result is False
