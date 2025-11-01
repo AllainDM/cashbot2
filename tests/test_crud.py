@@ -25,14 +25,28 @@ async def test_crud_add_note_success(mock_get_session, mock_datetime):
     # 1. Настройка Моков.
 
     # Устанавливаем предсказуемую дату, которую crud.py будет использовать.
-    # Чтобы быть уверенным, что тест падает от реальной ошибки.
+    #   Чтобы быть уверенным, что тест падает от реальной ошибки.
     fixed_date_str = "05.10.2025"
     mock_datetime.now.return_value.strftime.return_value = fixed_date_str
 
-    # Создаем мок объекта соединения (connection).
+    # Создаем мок объекта, который будет возвращен в 'as connection'
     mock_connection = AsyncMock()
-    # Настройка мока, чтобы get_async_sqlite_session() вернула наш mock_connection.
-    mock_get_session.return_value = mock_connection
+
+    # Создаем мок, который будет вести себя как асинхронный контекстный менеджер
+    #    Обычный MagicMock уже имеет методы __enter__ и __exit__,
+    #    но для асинхронного контекстного менеджера нужны __aenter__ и __aexit__.
+    mock_context_manager = MagicMock()
+
+    # Настраиваем, что произойдет при входе в 'async with' (т.е. при вызове __aenter__)
+    #    Он должен быть AWAITABLE и возвращать mock_connection
+    mock_context_manager.__aenter__ = AsyncMock(return_value=mock_connection)
+
+    # Настраиваем, что произойдет при выходе из 'async with' (т.е. при вызове __aexit__)
+    mock_context_manager.__aexit__ = AsyncMock(return_value=None)  # Ничего не возвращает
+
+    # Настраиваем патч get_async_sqlite_session, чтобы он возвращал наш контекстный менеджер
+    #    get_async_sqlite_session() -> mock_context_manager
+    mock_get_session.return_value = mock_context_manager
 
     # 2. Выполнение.
     result = await add_note(
@@ -46,6 +60,8 @@ async def test_crud_add_note_success(mock_get_session, mock_datetime):
     # 3. Проверка.
     # Проверяем, что функция получения соединения была вызвана один раз.
     mock_get_session.assert_called_once()
+    mock_context_manager.__aenter__.assert_called_once()
+    mock_context_manager.__aexit__.assert_called_once()
 
     # Ожидаемый SQL-запрос и параметры.
     expected_sql = (
@@ -68,7 +84,8 @@ async def test_crud_add_note_success(mock_get_session, mock_datetime):
     mock_connection.commit.assert_called_once()
 
     # Проверяем, что соединение было закрыто (независимо от результата).
-    mock_connection.close.assert_called_once()
+    # !!! Нет необходимости, работа через контекстный менеджер
+    # mock_connection.close.assert_called_once()
 
     # Проверяем, что функция вернула успешный результат.
     assert result is True

@@ -20,22 +20,22 @@ async def get_async_sqlite_session() -> AsyncGenerator[aiosqlite.Connection, Non
     Асинхронный контекстный менеджер для соединения с БД.
     Гарантирует, что соединение будет закрыто.
     """
-    conn = None
+    connection = None
     try:
         # Создаем асинхронное соединение с базой данных
-        conn = await aiosqlite.connect(config.DATABASE_NAME)
+        connection = await aiosqlite.connect(config.DATABASE_NAME)
         # Устанавливаем row_factory для вывода данных в виде словаря
-        conn.row_factory = aiosqlite.Row
+        connection.row_factory = aiosqlite.Row
         logger.debug("Асинхронное соединение с БД установлено.")
-        yield conn # Возвращаем соединение для использования в блоке 'async with'
+        yield connection # Возвращаем соединение для использования в блоке 'async with'
     except Exception as e:
         logger.error(f"Ошибка асинхронного соединения с БД: {e}")
         # Если соединение не удалось, yield не произойдет
         # raise  # Переподнимаем исключение, чтобы вызывающий код мог его обработать
         yield None
     finally:
-        if conn:
-            await conn.close()
+        if connection:
+            await connection.close()
             logger.debug("Асинхронное соединение с БД закрыто.")
 
 
@@ -44,14 +44,14 @@ async def update_tables():
     Асинхронное создание таблиц, если они не существуют,
     с использованием контекстного менеджера.
     """
-    # conn = await get_async_sqlite_session()
-    # if conn is None:
+    # connection = await get_async_sqlite_session()
+    # if connection is None:
     #     logger.error("Не удалось получить соединение с БД для создания таблиц.")
     #     return
     try:
-        async with get_async_sqlite_session() as conn:
+        async with get_async_sqlite_session() as connection:
             # Асинхронное выполнение SQL-запроса
-            await conn.execute("""
+            await connection.execute("""
                 CREATE TABLE IF NOT EXISTS "out" (
                     rowid INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_tg_id INTEGER NOT NULL,
@@ -64,11 +64,11 @@ async def update_tables():
             """)
             logger.info("Таблица 'out' проверена/создана.")
             # Асинхронный commit
-            await conn.commit()
+            await connection.commit()
     except Exception as e:
         logger.error(f"Ошибка при создании таблиц: {e}")
-    # Блок finally для закрытия conn не нужен,
+    # Блок finally для закрытия connection не нужен,
     # так как его обрабатывает контекстный менеджер.
     # finally:
-    #     await conn.close()
+    #     await connection.close()
     #     logger.debug(f"Соединение с БД {config.DATABASE_NAME} закрыто.")
